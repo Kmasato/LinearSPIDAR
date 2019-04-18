@@ -129,7 +129,6 @@ int SelectOutChannel(int motor,float value){
   else{
     switch (motor)
     {
-      
       case 1:
         return 2;
         break;
@@ -144,4 +143,3 @@ int SelectOutChannel(int motor,float value){
   }
 }
 
-//ちんこ
