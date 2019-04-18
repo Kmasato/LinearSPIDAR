@@ -16,6 +16,9 @@ int motor2b = 33; //モータ1逆転
 int enc2a = 18;   //モータ1エンコーダa相
 int enc2b = 19;   //モータ1エンコーダb相
 
+float g_myEnc1 = 0.0f;
+float g_myEnc2 = 0.0f;
+
 Encoder myEnc1(enc1a,enc1b);
 Encoder myEnc2(enc2a,enc2b);
 
@@ -55,8 +58,9 @@ void setup() {
 }
 
 void loop() {
-  driveMotor(1,targetPos);
-  driveMotor(2,targetPos);
+  g_myEnc2 = -g_myEnc1;
+  driveMotor(1,g_myEnc1);
+  driveMotor(2,g_myEnc2);
 }
 
 void driveMotor(int motor, float target){
@@ -75,6 +79,7 @@ void driveMotor(int motor, float target){
       iErr1 += (dErrPos + errPos)/2.0 * SAMPLE_TIME;
       ctrlPos = kp*errPos + kd*dErrPos + ki*iErr1;   //制御値
       prevErr1 = errPos;
+      g_myEnc1 = currentPos;
       break;
     
     case 2:
@@ -84,6 +89,7 @@ void driveMotor(int motor, float target){
       iErr2 += (dErrPos + errPos)/2.0 * SAMPLE_TIME;
       ctrlPos = kp*errPos + kd*dErrPos + ki*iErr2;   //制御値
       prevErr2 = errPos;
+      g_myEnc2 = currentPos;
       break;
 
     default:
