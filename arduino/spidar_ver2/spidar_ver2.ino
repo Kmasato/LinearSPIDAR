@@ -6,6 +6,8 @@
 #define COUNT_HIGH 65535
 #define SAMPLE_TIME 0.0000005
 
+//今使っているモーターの1週のエンコーダ値はだいたい2000
+
 int motor1a = 21; //モータ1正転
 int motor1b = 22; //モータ1逆転
 int enc1a = 26;   //モータ1エンコーダa相
@@ -58,9 +60,8 @@ void setup() {
 }
 
 void loop() {
-  g_myEnc2 = -g_myEnc1;
-  driveMotor(1,g_myEnc1);
-  driveMotor(2,g_myEnc2);
+  driveMotor(1,targetPos);
+  driveMotor(2,targetPos);
 }
 
 void driveMotor(int motor, float target){
