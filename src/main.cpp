@@ -1,10 +1,14 @@
 #include <Arduino.h>
 #include <Encoder.h>
 
-#define TIMER_WIDTH
 #define COUNT_LOW 0
 #define COUNT_HIGH 65535
+#define ENC_MAX 2000
 #define SAMPLE_TIME 0.0000005
+#define PULLY_R 1.0 //仮の数字
+
+float currentX = 0.0f; //x軸の座標
+float prevX = 0.0f;
 
 int motor1a = 21; //モータ1正転
 int motor1b = 22; //モータ1逆転
@@ -22,7 +26,7 @@ Encoder myEnc2(enc2a,enc2b);
 /* 目標値 */
 float targetPos = 0.0f;
 
-/* PD制御の係数*/
+/* PID制御の係数*/
 float kp = 300;
 float kd = 10;
 float ki = 0.005;
@@ -32,6 +36,7 @@ float prevErr1 = 0.0f;
 float prevErr2 = 0.0f;
 
 /*関数のプロトタイプ宣言*/
+float readAxisPosition(char);
 void driveMotor(int, float);
 void motorOut(int, float);
 int SelectOutChannel(int, float);
@@ -55,9 +60,30 @@ void setup() {
 }
 
 void loop() {
-  driveMotor(1,targetPos);
-  driveMotor(2,targetPos);
+  //driveMotor(1,targetPos);
+  //driveMotor(2,targetPos);
+  currentX = readAxisPosition('x');
+  if(currentX - prevX > 0)
+    driveMotor(2,currentX);
+  prevX = currentX;
 }
+
+float readAxisPosition(char axis){
+  float pos = 0.0f;
+  switch (axis)
+  {
+    case 'x':
+      pos = (PULLY_R * 2*PI*float(myEnc1.read()))/ENC_MAX;
+      //pos = myEnc1.read();
+      break;
+  
+    default:
+      break;
+  }
+
+  return pos;
+}
+
 
 void driveMotor(int motor, float target){
   
@@ -65,6 +91,9 @@ void driveMotor(int motor, float target){
   float currentPos = 0.0f;
   float errPos = 0.0f;
   float dErrPos = 0.0f;
+
+  //target = (target/PULLY_R) * (ENC_MAX/2*PI); //制御値に変換
+  target = float(target*ENC_MAX)/(2*PI*PULLY_R);
 
   switch (motor)
   {
